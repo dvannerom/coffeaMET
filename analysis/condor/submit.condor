@@ -1,0 +1,11 @@
+executable   = /afs/cern.ch/user/v/vannerom/work/MET/decafMET/decafMET/analysis/condor_jobs/submit.sh
+arguments    = "$(jsonFile)"
+
+output       = /afs/cern.ch/user/v/vannerom/work/MET/decafMET/decafMET/analysis/condor_log/submit_$(cluster).out
+error        = /afs/cern.ch/user/v/vannerom/work/MET/decafMET/decafMET/analysis/condor_log/submit_$(cluster).err
+log          = /afs/cern.ch/user/v/vannerom/work/MET/decafMET/decafMET/analysis/condor_log/submit_$(cluster).log
+
+getenv       = True
+
+universe     = vanilla
+queue
