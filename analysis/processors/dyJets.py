@@ -11,7 +11,7 @@ import array
 import json
 import numpy as np
 
-from processor import prescales
+#from processor import prescales
 
 def METCleaning(events):
     return (events.Flag.goodVertices &

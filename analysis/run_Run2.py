@@ -18,11 +18,6 @@ import argparse
 
 import time
 
-#from dask.distributed import Client
-#from dask_lxplus import HTCondorCluster
-#from dask_lxplus import CernCluster
-#import socket
-
 import performance_Run2
 
 def hname():
@@ -49,59 +44,6 @@ if __name__ == '__main__':
 	with open(inFile) as json_file:
 		tic = time.time()
 	
-		#n_port = 8786
-		#if not check_port(8786):
-		#	raise RuntimeError("Port '8786' is not occupied on this node. Try another one.")
-		#import socket
-		#cluster = HTCondorCluster(
-		#	cores=1,
-		#	memory='2GB', # hardcoded
-		#	disk='1GB',
-		#	death_timeout = '60',
-		#	nanny = False,
-		#	scheduler_options={
-		#		'port': n_port,
-		#		'host': socket.gethostname()
-		#		},
-		#	job_extra={
-		#		'log': 'dask_job_output.log',
-		#		'output': 'dask_job_output.out',
-		#		'error': 'dask_job_output.err',
-		#		'should_transfer_files': 'Yes',
-		#		'when_to_transfer_output': 'ON_EXIT',
-		#		'+JobFlavour': '"workday"',
-		#		},
-		#	extra = ['--worker-port {}'.format(n_port)],
-		#	#env_extra = env_extra,
-		#)
-		#client = Client(cluster)
-		#cluster = CernCluster(
-		#	cores=1,
-		#	memory='2000MB',
-		#	disk='1000MB',
-		#	death_timeout = '60',
-		#	lcg = True,
-		#	nanny = False,
-		#	container_runtime = "none",
-		#	log_directory = "/afs/cern.ch/user/v/vannerom/work/MET/decafMET/decafMET/analysis/condor_log/",
-		#	scheduler_options={
-		#		'port': n_port,
-		#		'host': socket.gethostname(),
-		#		},
-		#	job_extra={
-		#		'+JobFlavour': '"tomorrow"',
-		#		},
-		#	extra = ['--worker-port 10000:10100']
-		#)
-		#print(cluster.job_script())
-		#client = Client(cluster)
-		#futures = []
-		#cluster.scale(4)
-		#for i in range(4):
-		#	f = client.submit(hname)
-		#	futures.append(f)
-		#print('Result is {}'.format(client.gather(futures)))
-	
 		data = json.load(json_file)
 		for a in data.keys():
 			print(a)
@@ -112,20 +54,12 @@ if __name__ == '__main__':
 				"workers": 10,
 				"savemetrics": True,
 			}
-			#exe_args = {
-			#	"client": client,
-			#	"skipbadfiles": True,
-			#	#"savemetrics": True,
-			#	"schema": NanoAODSchema,
-			#	#"align_clusters": True,
-			#}
 			result, metrics = processor.run_uproot_job(
 				fileset,
 				"Events",
 				processor_instance=performance_Run2.performanceProcessor(),
 				#executor=processor.iterative_executor,
 				executor=processor.futures_executor,
-				#executor=processor.dask_executor,
 				executor_args=exe_args,
 				#chunksize = 25000
 			)

@@ -20,9 +20,6 @@ import json
 import numpy as np
 
 from processor import gammaJets, dyJets
-import METCorrections
-
-import utilsJEC
 
 class performanceProcessor(processor.ProcessorABC):
 	def __init__(self):

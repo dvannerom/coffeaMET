@@ -1,0 +1,13 @@
+executable   = /afs/cern.ch/user/v/vannerom/work/MET/coffeaMET/analysis/condor/submit.sh
+arguments    = json
+
+output       = /afs/cern.ch/user/v/vannerom/work/MET/coffeaMET/analysis/condor/submit_$(cluster).out
+error        = /afs/cern.ch/user/v/vannerom/work/MET/coffeaMET/analysis/condor/submit_$(cluster).err
+log          = /afs/cern.ch/user/v/vannerom/work/MET/coffeaMET/analysis/condor/submit_$(cluster).log
+
+getenv       = True
+
+universe     = vanilla
++JobFlavour  = "microcentury"
+
+queue

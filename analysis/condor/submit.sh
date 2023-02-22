@@ -1,6 +1,6 @@
 #!/bin/bash
 
-wd=/afs/cern.ch/user/v/vannerom/work/MET/decafMET/decafMET/
+wd=/afs/cern.ch/user/v/vannerom/work/MET/coffeaMET/
 
 cd $wd
 

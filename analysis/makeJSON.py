@@ -1,4 +1,4 @@
-rawFileName = "data/EGamma2018A_Raw.txt"
+rawFileName = "data/EGamma2018A_eos.txt"
 rawFile = open(rawFileName)
 rawContent = rawFile.readlines()
 nFiles = len(rawContent)
