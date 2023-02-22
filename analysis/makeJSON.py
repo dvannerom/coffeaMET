@@ -1,4 +1,5 @@
-rawFileName = "data/EGamma2018A_eos.txt"
+run = "EGamma2018D"
+rawFileName = "data/"+run+"_eos.txt"
 rawFile = open(rawFileName)
 rawContent = rawFile.readlines()
 nFiles = len(rawContent)
@@ -9,10 +10,10 @@ nFilesPerJobs = 20
 i = 1
 loop = True
 while loop:
-	fileName = "data/EGamma2018A_"+str(i)+".json"
+	fileName = "data/"+run+"_"+str(i)+".json"
 	with open(fileName, "w") as f:
 		f.write("{\n")
-		f.write("\"EGamma2018A\": [\n")
+		f.write("\""+run+"\": [\n")
 	for j in range(nFilesPerJobs):
 		index = (i-1)*nFilesPerJobs + j
 		if index >= nFiles:
