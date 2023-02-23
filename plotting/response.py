@@ -39,9 +39,9 @@ if __name__ == '__main__':
 	inFile = ROOT.TFile.Open(inputFile,"READ")
 	
 	h_response_pf_raw = inFile.Get("response_pf_raw_vs_"+variable)
-	h_response_pf = inFile.Get("response_pf_JECCorr_vs_"+variable)
+	h_response_pf = inFile.Get("response_pf_vs_"+variable)
 	h_response_puppi_raw = inFile.Get("response_puppi_raw_vs_"+variable)
-	h_response_puppi = inFile.Get("response_puppi_JECCorr_vs_"+variable)
+	h_response_puppi = inFile.Get("response_puppi_vs_"+variable)
 	
 	response_pf_raw = response(h_response_pf_raw)
 	response_pf = response(h_response_pf)
@@ -52,17 +52,18 @@ if __name__ == '__main__':
 	tdrstyle.setTDRStyle()
 	
 	#change the CMS_lumi variables (see CMS_lumi.py)
-#	CMS_lumi.lumi_13TeV = "1.82 fb^{-1}"
-	if isData: CMS_lumi.lumi_13p6TeV = "2.94 fb^{-1}"
+	#if isData: CMS_lumi.lumi_13p6TeV = "2.94 fb^{-1}"
+	if isData: CMS_lumi.lumi_13TeV = "59.8 fb^{-1}"
 	CMS_lumi.writeExtraText = 1
 	if isData: CMS_lumi.extraText = "Preliminary"
 	else: CMS_lumi.extraText = "Simulation Preliminary"
-	CMS_lumi.lumi_sqrtS = "13.6 TeV" # used with iPeriod = 0, e.g. for simulation-only plots (default is an empty string)
+	#CMS_lumi.lumi_sqrtS = "13.6 TeV" # used with iPeriod = 0, e.g. for simulation-only plots (default is an empty string)
+	CMS_lumi.lumi_sqrtS = "13 TeV" # used with iPeriod = 0, e.g. for simulation-only plots (default is an empty string)
 	
 	iPos = 11
 	
 	iPeriod = 0
-	if isData: iPeriod = 5
+	if isData: iPeriod = 4
 	
 	H_ref = 700 
 	W_ref = 850 
@@ -101,7 +102,9 @@ if __name__ == '__main__':
 	response_pf_raw.SetLineColor(ROOT.kBlue)
 	response_pf_raw.SetMarkerColor(ROOT.kBlue)
 	response_pf_raw.SetMarkerStyle(21)
-	response_pf_raw.SetMinimum(0.3)
+	#response_pf_raw.SetMinimum(0.3)
+	#response_pf_raw.SetMaximum(1.25)
+	response_pf_raw.SetMinimum(0.7)
 	response_pf_raw.SetMaximum(1.25)
 	response_pf_raw.GetXaxis().SetTitle("q_{T} (GeV)")
 	response_pf_raw.GetYaxis().SetTitle("-<u_{#parallel}/q_{T}>")
