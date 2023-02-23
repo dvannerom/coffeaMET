@@ -137,8 +137,8 @@ if __name__ == '__main__':
 	latex.SetTextFont(42)
 	latex.SetTextSize(0.04)
 	#latex.SetTextAlign(13);  //align at top
-	if isData: latex.DrawLatexNDC(.3,.35,"#bf{#mu#mu} channel")
-	else: latex.DrawLatexNDC(.3,.35,"DY(#bf{#mu#mu}) channel")
+	if dataset=="gamma": latex.DrawLatexNDC(.3,.35,"#bf{#gamma}+jets channel")
+	elif dataset=="dy": latex.DrawLatexNDC(.3,.35,"#bf{#mu#mu}+jets channel")
 	
 	leg = ROOT.TLegend(.58,.25,.83,.48)
 	leg.SetBorderSize(0)
