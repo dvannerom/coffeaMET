@@ -51,7 +51,7 @@ if __name__ == '__main__':
 			exe_args = {
 				"skipbadfiles": True,
 				"schema": NanoAODSchema,
-				"workers": 10,
+				"workers": 8,
 				"savemetrics": True,
 			}
 			result, metrics = processor.run_uproot_job(
@@ -61,7 +61,6 @@ if __name__ == '__main__':
 				#executor=processor.iterative_executor,
 				executor=processor.futures_executor,
 				executor_args=exe_args,
-				#chunksize = 25000
 			)
 			util.save(result,'results/2018/'+a+'_'+str(index)+'.coffea')
 			output_root_file = 'results/2018/'+a+'_'+str(index)+'.root'
@@ -119,16 +118,16 @@ if __name__ == '__main__':
 					outputfile['nEventsTriggers'] = hist.export1d(result[var])
 				elif var == 'histo14':
 					outputfile['nEventsNPV'] = hist.export1d(result[var])
-				#elif var == 'histo20':
-				#	outputfile['nEventsMuon'] = hist.export1d(result[var])
 				elif var == 'histo15':
-					outputfile['nEventsPhoton'] = hist.export1d(result[var])
-				elif var == 'histo16':
-					outputfile['nEventsLepton'] = hist.export1d(result[var])
-				elif var == 'histo17':
-					outputfile['nEventsJet'] = hist.export1d(result[var])
-				elif var == 'histo18':
-					outputfile['nEventsDeltaR'] = hist.export1d(result[var])
+					outputfile['nEventsMuon'] = hist.export1d(result[var])
+				#elif var == 'histo15':
+				#	outputfile['nEventsPhoton'] = hist.export1d(result[var])
+				#elif var == 'histo16':
+				#	outputfile['nEventsLepton'] = hist.export1d(result[var])
+				#elif var == 'histo17':
+				#	outputfile['nEventsJet'] = hist.export1d(result[var])
+				#elif var == 'histo18':
+				#	outputfile['nEventsDeltaR'] = hist.export1d(result[var])
 			outputfile.close()
 			
 			infile = TFile.Open(output_root_file,"update")

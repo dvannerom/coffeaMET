@@ -18,12 +18,7 @@ import argparse
 
 import time
 
-#from dask.distributed import Client
-#from dask_lxplus import HTCondorCluster
-#from dask_lxplus import CernCluster
-#import socket
-
-import performance_Run2
+import performance
 
 def hname():
 	import socket
@@ -43,62 +38,11 @@ if __name__ == '__main__':
 	args = parser.parse_args()
 	
 	inFile = args.inFile
+
+	index = inFile.split('/')[-1].split('.')[0].split('_')[-1]
 	
 	with open(inFile) as json_file:
 		tic = time.time()
-	
-		#n_port = 8786
-		#if not check_port(8786):
-		#	raise RuntimeError("Port '8786' is not occupied on this node. Try another one.")
-		#import socket
-		#cluster = HTCondorCluster(
-		#	cores=1,
-		#	memory='2GB', # hardcoded
-		#	disk='1GB',
-		#	death_timeout = '60',
-		#	nanny = False,
-		#	scheduler_options={
-		#		'port': n_port,
-		#		'host': socket.gethostname()
-		#		},
-		#	job_extra={
-		#		'log': 'dask_job_output.log',
-		#		'output': 'dask_job_output.out',
-		#		'error': 'dask_job_output.err',
-		#		'should_transfer_files': 'Yes',
-		#		'when_to_transfer_output': 'ON_EXIT',
-		#		'+JobFlavour': '"workday"',
-		#		},
-		#	extra = ['--worker-port {}'.format(n_port)],
-		#	#env_extra = env_extra,
-		#)
-		#client = Client(cluster)
-		#cluster = CernCluster(
-		#	cores=1,
-		#	memory='2000MB',
-		#	disk='1000MB',
-		#	death_timeout = '60',
-		#	lcg = True,
-		#	nanny = False,
-		#	container_runtime = "none",
-		#	log_directory = "/afs/cern.ch/user/v/vannerom/work/MET/decafMET/decafMET/analysis/condor_log/",
-		#	scheduler_options={
-		#		'port': n_port,
-		#		'host': socket.gethostname(),
-		#		},
-		#	job_extra={
-		#		'+JobFlavour': '"tomorrow"',
-		#		},
-		#	extra = ['--worker-port 10000:10100']
-		#)
-		#print(cluster.job_script())
-		#client = Client(cluster)
-		#futures = []
-		#cluster.scale(4)
-		#for i in range(4):
-		#	f = client.submit(hname)
-		#	futures.append(f)
-		#print('Result is {}'.format(client.gather(futures)))
 	
 		data = json.load(json_file)
 		for a in data.keys():
@@ -107,28 +51,20 @@ if __name__ == '__main__':
 			exe_args = {
 				"skipbadfiles": True,
 				"schema": NanoAODSchema,
-				"workers": 10,
+				"workers": 8,
 				"savemetrics": True,
 			}
-			#exe_args = {
-			#	"client": client,
-			#	"skipbadfiles": True,
-			#	#"savemetrics": True,
-			#	"schema": NanoAODSchema,
-			#	#"align_clusters": True,
-			#}
 			result, metrics = processor.run_uproot_job(
 				fileset,
 				"Events",
-				processor_instance=performance_Run2.performanceProcessor(),
+				processor_instance=performance.performanceProcessor(),
 				#executor=processor.iterative_executor,
 				executor=processor.futures_executor,
 				#executor=processor.dask_executor,
 				executor_args=exe_args,
-				chunksize = 25000
 			)
-			util.save(result,'results/2018/'+a+'.coffea')
-			output_root_file = 'results/2018/'+a+'.root'
+			util.save(result,'results/2018/'+a+'_'+str(index)+'.coffea')
+			output_root_file = 'results/2018/'+a+'_'+str(index)+'.root'
 	
 			elapsed = time.time() - tic
 			print(f"Output: {result}")
@@ -198,16 +134,16 @@ if __name__ == '__main__':
 					outputfile['nEventsTriggers'] = hist.export1d(result[var])
 				elif var == 'histo19':
 					outputfile['nEventsNPV'] = hist.export1d(result[var])
-				#elif var == 'histo20':
-				#	outputfile['nEventsMuon'] = hist.export1d(result[var])
 				elif var == 'histo20':
-					outputfile['nEventsPhoton'] = hist.export1d(result[var])
-				elif var == 'histo21':
-					outputfile['nEventsLepton'] = hist.export1d(result[var])
-				elif var == 'histo22':
-					outputfile['nEventsJet'] = hist.export1d(result[var])
-				elif var == 'histo23':
-					outputfile['nEventsDeltaR'] = hist.export1d(result[var])
+					outputfile['nEventsMuon'] = hist.export1d(result[var])
+				#elif var == 'histo20':
+				#	outputfile['nEventsPhoton'] = hist.export1d(result[var])
+				#elif var == 'histo21':
+				#	outputfile['nEventsLepton'] = hist.export1d(result[var])
+				#elif var == 'histo22':
+				#	outputfile['nEventsJet'] = hist.export1d(result[var])
+				#elif var == 'histo23':
+				#	outputfile['nEventsDeltaR'] = hist.export1d(result[var])
 			outputfile.close()
 			
 			infile = TFile.Open(output_root_file,"update")

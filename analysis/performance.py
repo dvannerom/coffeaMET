@@ -10,6 +10,8 @@ from coffea.jetmet_tools import JECStack, CorrectedJetsFactory
 from coffea.lookup_tools import extractor
 from coffea.analysis_tools import PackedSelection
 
+import utilsJEC
+
 import uproot3
 import hist2root
 import ROOT
@@ -19,7 +21,7 @@ import array
 import json
 import numpy as np
 
-from processor import gammaJets, dyJets
+from processors import gammaJets, dyJets
 
 class performanceProcessor(processor.ProcessorABC):
 	def __init__(self):
@@ -161,27 +163,27 @@ class performanceProcessor(processor.ProcessorABC):
 			hist.Bin("nEventsNPV", "Number of events after npv cut", 1, 0, 1),
 		)
 		# DY
-		#self._histo20 = hist.Hist(
-		#	"Events",
-		#	hist.Bin("nEventsMuon", "Number of events after muon selection", 1, 0, 1),
-		#)
-		# Gamma
 		self._histo20 = hist.Hist(
 			"Events",
-			hist.Bin("nEventsPhoton", "Number of events after photon selection", 1, 0, 1),
+			hist.Bin("nEventsMuon", "Number of events after muon selection", 1, 0, 1),
 		)
-		self._histo21 = hist.Hist(
-			"Events",
-			hist.Bin("nEventsLepton", "Number of events after lepton veto", 1, 0, 1),
-		)
-		self._histo22 = hist.Hist(
-			"Events",
-			hist.Bin("nEventsJet", "Number of events after jet veto", 1, 0, 1),
-		)
-		self._histo23 = hist.Hist(
-			"Events",
-			hist.Bin("nEventsDeltaR", "Number of events after deltaR selection", 1, 0, 1),
-		)
+		# Gamma
+		#self._histo20 = hist.Hist(
+		#	"Events",
+		#	hist.Bin("nEventsPhoton", "Number of events after photon selection", 1, 0, 1),
+		#)
+		#self._histo21 = hist.Hist(
+		#	"Events",
+		#	hist.Bin("nEventsLepton", "Number of events after lepton veto", 1, 0, 1),
+		#)
+		#self._histo22 = hist.Hist(
+		#	"Events",
+		#	hist.Bin("nEventsJet", "Number of events after jet veto", 1, 0, 1),
+		#)
+		#self._histo23 = hist.Hist(
+		#	"Events",
+		#	hist.Bin("nEventsDeltaR", "Number of events after deltaR selection", 1, 0, 1),
+		#)
 		
 		self._accumulator = processor.dict_accumulator({
 			'histo1':self._histo1,
@@ -204,9 +206,9 @@ class performanceProcessor(processor.ProcessorABC):
 			'histo18':self._histo18,
 			'histo19':self._histo19,
 			'histo20':self._histo20,
-			'histo21':self._histo21,
-			'histo22':self._histo22,
-			'histo23':self._histo23,
+			#'histo21':self._histo21,
+			#'histo22':self._histo22,
+			#'histo23':self._histo23,
 		})
 
 	@property
@@ -219,76 +221,70 @@ class performanceProcessor(processor.ProcessorABC):
 		out = self.accumulator.identity()
 
 		# For DY
-		#nEventsTot = dyJets.dyJetsSelection(events)['nEvents_tot']
-		#nEventsLumi = dyJets.dyJetsSelection(events)['nEvents_lumi']
-		#nEventsFilters = dyJets.dyJetsSelection(events)['nEvents_filters']
-		#nEventsTriggers = dyJets.dyJetsSelection(events)['nEvents_trigger']
-		#nEventsNPV = dyJets.dyJetsSelection(events)['nEvents_npv']
-		#nEventsMuon = dyJets.dyJetsSelection(events)['nEvents_muon']
-		#nEventsTot = np.zeros(nEventsTot)
-		#nEventsLumi = np.zeros(nEventsLumi)
-		#nEventsFilters = np.zeros(nEventsFilters)
-		#nEventsTriggers = np.zeros(nEventsTriggers)
-		#nEventsNPV = np.zeros(nEventsNPV)
-		#nEventsMuon = np.zeros(nEventsMuon)
-
-		# For Gamma
-		nEventsTot = gammaJets.gammaJetsSelection(events)['nEvents_tot']
-		nEventsLumi = gammaJets.gammaJetsSelection(events)['nEvents_lumi']
-		nEventsFilters = gammaJets.gammaJetsSelection(events)['nEvents_filters']
-		nEventsTriggers = gammaJets.gammaJetsSelection(events)['nEvents_trigger']
-		nEventsNPV = gammaJets.gammaJetsSelection(events)['nEvents_npv']
-		nEventsPhoton = gammaJets.gammaJetsSelection(events)['nEvents_photon']
-		nEventsLepton = gammaJets.gammaJetsSelection(events)['nEvents_lepton']
-		nEventsJet = gammaJets.gammaJetsSelection(events)['nEvents_jet']
-		nEventsDeltaR = gammaJets.gammaJetsSelection(events)['nEvents_deltaR']
+		nEventsTot = dyJets.dyJetsSelection(events)['nEvents_tot']
+		nEventsLumi = dyJets.dyJetsSelection(events)['nEvents_lumi']
+		nEventsFilters = dyJets.dyJetsSelection(events)['nEvents_filters']
+		nEventsTriggers = dyJets.dyJetsSelection(events)['nEvents_trigger']
+		nEventsNPV = dyJets.dyJetsSelection(events)['nEvents_npv']
+		nEventsMuon = dyJets.dyJetsSelection(events)['nEvents_muon']
 		nEventsTot = np.zeros(nEventsTot)
 		nEventsLumi = np.zeros(nEventsLumi)
 		nEventsFilters = np.zeros(nEventsFilters)
 		nEventsTriggers = np.zeros(nEventsTriggers)
 		nEventsNPV = np.zeros(nEventsNPV)
-		nEventsPhoton = np.zeros(nEventsPhoton)
-		nEventsLepton = np.zeros(nEventsLepton)
-		nEventsJet = np.zeros(nEventsJet)
-		nEventsDeltaR = np.zeros(nEventsDeltaR)
+		nEventsMuon = np.zeros(nEventsMuon)
 
-		#events = gammaJets.gammaJetsSelection(events)['events']
-		#
-		#boson = gammaJets.gammaJetsSelection(events)['boson']
-		#pv = gammaJets.gammaJetsSelection(events)['pv']
-		#met_raw = gammaJets.gammaJetsSelection(events)['met_raw']
-		#met_pf = gammaJets.gammaJetsSelection(events)['met_pf']
-		#met_puppi = gammaJets.gammaJetsSelection(events)['met_puppi']
+		# For Gamma
+		#nEventsTot = gammaJets.gammaJetsSelection(events)['nEvents_tot']
+		#nEventsLumi = gammaJets.gammaJetsSelection(events)['nEvents_lumi']
+		#nEventsFilters = gammaJets.gammaJetsSelection(events)['nEvents_filters']
+		#nEventsTriggers = gammaJets.gammaJetsSelection(events)['nEvents_trigger']
+		#nEventsNPV = gammaJets.gammaJetsSelection(events)['nEvents_npv']
+		#nEventsPhoton = gammaJets.gammaJetsSelection(events)['nEvents_photon']
+		#nEventsLepton = gammaJets.gammaJetsSelection(events)['nEvents_lepton']
+		#nEventsJet = gammaJets.gammaJetsSelection(events)['nEvents_jet']
+		#nEventsDeltaR = gammaJets.gammaJetsSelection(events)['nEvents_deltaR']
+		#nEventsTot = np.zeros(nEventsTot)
+		#nEventsLumi = np.zeros(nEventsLumi)
+		#nEventsFilters = np.zeros(nEventsFilters)
+		#nEventsTriggers = np.zeros(nEventsTriggers)
+		#nEventsNPV = np.zeros(nEventsNPV)
+		#nEventsPhoton = np.zeros(nEventsPhoton)
+		#nEventsLepton = np.zeros(nEventsLepton)
+		#nEventsJet = np.zeros(nEventsJet)
+		#nEventsDeltaR = np.zeros(nEventsDeltaR)
 
 		# For DY
-		#events = dyJets.dyJetsSelection(events)['events']
-		#boson = dyJets.dyJetsSelection(events)['boson']
-		#boson_pt = boson.pt # For DY
-		#pv = dyJets.dyJetsSelection(events)['pv']
-		#met_pf_raw = dyJets.dyJetsSelection(events)['met_pf_raw']
-		#met_pf = dyJets.dyJetsSelection(events)['met_pf']
-		#met_puppi_raw = dyJets.dyJetsSelection(events)['met_puppi_raw']
-		#met_puppi = dyJets.dyJetsSelection(events)['met_puppi']
+		events = dyJets.dyJetsSelection(events)['events']
+		boson = dyJets.dyJetsSelection(events)['boson']
+		boson_pt = boson.pt
+		pv = dyJets.dyJetsSelection(events)['pv']
+		met_pf_raw = dyJets.dyJetsSelection(events)['met_pf_raw']
+		met_pf = dyJets.dyJetsSelection(events)['met_pf']
+		met_puppi_raw = dyJets.dyJetsSelection(events)['met_puppi_raw']
+		met_puppi = dyJets.dyJetsSelection(events)['met_puppi']
 
 		# For Gamma 
-		events = gammaJets.gammaJetsSelection(events)['events']
-		boson = gammaJets.gammaJetsSelection(events)['boson']
-		boson_pt = boson.pt[:,0]
-		pv = gammaJets.gammaJetsSelection(events)['pv']
-		met_pf_raw = gammaJets.gammaJetsSelection(events)['met_pf_raw']
-		met_pf = gammaJets.gammaJetsSelection(events)['met_pf']
-		met_puppi_raw = gammaJets.gammaJetsSelection(events)['met_puppi_raw']
-		met_puppi = gammaJets.gammaJetsSelection(events)['met_puppi']
+		#events = gammaJets.gammaJetsSelection(events)['events']
+		#boson = gammaJets.gammaJetsSelection(events)['boson']
+		#boson_pt = boson.pt[:,0]
+		#pv = gammaJets.gammaJetsSelection(events)['pv']
+		#met_pf_raw = gammaJets.gammaJetsSelection(events)['met_pf_raw']
+		#met_pf = gammaJets.gammaJetsSelection(events)['met_pf']
+		#met_puppi_raw = gammaJets.gammaJetsSelection(events)['met_puppi_raw']
+		#met_puppi = gammaJets.gammaJetsSelection(events)['met_puppi']
 
 		# JMENano v9
-		chsJets = events.Jet[utilsJEC.isGoodJet(events.Jet)]
+		#chsJets = events.Jet[utilsJEC.isGoodJet(events.Jet)]
 		#puppiJets = events.JetPuppi[utilsJEC.isGoodJet(events.JetPuppi)]
 		# JMENano v10
-		#chsJets = events.JetCHS[utilsJEC.isGoodJet(events.JetCHS)]
-		#puppiJets = events.Jet[utilsJEC.isGoodJet(events.Jet)]
+		chsJets = events.JetCHS[utilsJEC.isGoodJet(events.JetCHS)]
+		puppiJets = events.Jet[utilsJEC.isGoodJet(events.Jet)]
 
-		corrected_chsJets = utilsJEC.correctedMCChsJets(events,chsJets)
-		corrected_puppiJets = utilsJEC.correctedMCPuppiJets(events,puppiJets)
+		#corrected_chsJets = utilsJEC.correctedDataChsJets(events,chsJets)
+		corrected_chsJets = chsJets
+		corrected_puppiJets = utilsJEC.correctedDataPuppiJets(events,puppiJets)
+		#corrected_puppiJets = utilsJEC.correctedMCPuppiJets(events,puppiJets)
 
 		# Sum x and y components over all jets in the event
 		raw_chsJets_px = chsJets['pt']*np.cos(chsJets['phi'])
@@ -425,9 +421,9 @@ class performanceProcessor(processor.ProcessorABC):
 		uperp_puppi_JECCorr = (vec_u_puppi_JECCorr.y*vec_boson_unit.x) - (vec_u_puppi_JECCorr.x*vec_boson_unit.y)
 	
 		# For DY	
-		#weights = dyJets.dyJetsSelection(events)['weights']
+		weights = dyJets.dyJetsSelection(events)['weights']
 		# For Gamma
-		weights = gammaJets.gammaJetsSelection(events)['weights']
+		#weights = gammaJets.gammaJetsSelection(events)['weights']
 	
 		out['histo1'].fill(
 			dataset=events.metadata["dataset"],
@@ -450,8 +446,8 @@ class performanceProcessor(processor.ProcessorABC):
 			qt=boson_pt,
 			pv=pv.npvs,
 			met_pf_raw=met_pf_raw.pt,
-			response_pf_raw=response_pf_raw[:,0],
-			#response_pf_raw=response_pf_raw,
+			#response_pf_raw=response_pf_raw[:,0],
+			response_pf_raw=response_pf_raw,
 			weight=weights,
 		)
 		out['histo4'].fill(
@@ -459,8 +455,8 @@ class performanceProcessor(processor.ProcessorABC):
 			qt=boson_pt,
 			pv=pv.npvs,
 			met_puppi_raw=met_puppi_raw.pt,
-			response_puppi_raw=response_puppi_raw[:,0],
-			#response_puppi_raw=response_puppi_raw,
+			#response_puppi_raw=response_puppi_raw[:,0],
+			response_puppi_raw=response_puppi_raw,
 			weight=weights,
 		)
 		out['histo5'].fill(
@@ -468,8 +464,8 @@ class performanceProcessor(processor.ProcessorABC):
 			qt=boson_pt,
 			pv=pv.npvs,
 			met_pf=met_pf.pt,
-			response_pf=response_pf[:,0],
-			#response_pf=response_pf,
+			#response_pf=response_pf[:,0],
+			response_pf=response_pf,
 			weight=weights,
 		)
 		out['histo6'].fill(
@@ -479,7 +475,7 @@ class performanceProcessor(processor.ProcessorABC):
 			#met_pf_JECCorr=vec_met_pf_JECCorr.pt[:,0],
 			#response_pf_JECCorr=response_pf_JECCorr[:,0],
 			met_pf_JECCorr=vec_met_pf_JECCorr.pt,
-			response_pf_JECCorr=response_pf_JECCorr[:,0],
+			response_pf_JECCorr=response_pf_JECCorr,
 			weight=weights,
 		)
 		out['histo7'].fill(
@@ -487,7 +483,8 @@ class performanceProcessor(processor.ProcessorABC):
 			qt=boson_pt,
 			pv=pv.npvs,
 			met_puppi=met_puppi.pt,
-			response_puppi=response_puppi[:,0],
+			#response_puppi=response_puppi[:,0],
+			response_puppi=response_puppi,
 			weight=weights,
 		)
 		out['histo8'].fill(
@@ -497,64 +494,67 @@ class performanceProcessor(processor.ProcessorABC):
 			#met_puppi_JECCorr=vec_met_puppi_JECCorr.pt[:,0],
 			#response_puppi_JECCorr=response_puppi_JECCorr[:,0],
 			met_puppi_JECCorr=vec_met_puppi_JECCorr.pt,
-			response_puppi_JECCorr=response_puppi_JECCorr[:,0],
-			#response_puppi=response_puppi[:,0],
+			response_puppi_JECCorr=response_puppi_JECCorr,
 			weight=weights,
 		)
 		out['histo9'].fill(
 			dataset=events.metadata["dataset"],
 			qt=boson_pt,
 			pv=pv.npvs,
-			upar_pf_raw_plus_qt=upar_pf_raw_plus_qt[:,0],
-			upar_puppi_raw_plus_qt=upar_puppi_raw_plus_qt[:,0],
+			#upar_pf_raw_plus_qt=upar_pf_raw_plus_qt[:,0],
+			#upar_puppi_raw_plus_qt=upar_puppi_raw_plus_qt[:,0],
+			upar_pf_raw_plus_qt=upar_pf_raw_plus_qt,
+			upar_puppi_raw_plus_qt=upar_puppi_raw_plus_qt,
 			weight=weights,
 		)
 		out['histo10'].fill(
 			dataset=events.metadata["dataset"],
 			qt=boson_pt,
 			pv=pv.npvs,
-			upar_pf_plus_qt=upar_pf_plus_qt[:,0],
-			upar_pf_plus_qt_JECCorr=upar_pf_plus_qt_JECCorr[:,0],
-			#upar_pf_plus_qt=upar_pf_plus_qt,
-			#upar_pf_plus_qt_JECCorr=upar_pf_plus_qt_JECCorr,
+			#upar_pf_plus_qt=upar_pf_plus_qt[:,0],
+			#upar_pf_plus_qt_JECCorr=upar_pf_plus_qt_JECCorr[:,0],
+			upar_pf_plus_qt=upar_pf_plus_qt,
+			upar_pf_plus_qt_JECCorr=upar_pf_plus_qt_JECCorr,
 			weight=weights,
 		)
 		out['histo11'].fill(
 			dataset=events.metadata["dataset"],
 			qt=boson_pt,
 			pv=pv.npvs,
-			upar_puppi_plus_qt=upar_puppi_plus_qt[:,0],
-			upar_puppi_plus_qt_JECCorr=upar_puppi_plus_qt_JECCorr[:,0],
-			#upar_puppi_plus_qt=upar_puppi_plus_qt,
-			#upar_puppi_plus_qt_JECCorr=upar_puppi_plus_qt_JECCorr,
+			#upar_puppi_plus_qt=upar_puppi_plus_qt[:,0],
+			#upar_puppi_plus_qt_JECCorr=upar_puppi_plus_qt_JECCorr[:,0],
+			upar_puppi_plus_qt=upar_puppi_plus_qt,
+			upar_puppi_plus_qt_JECCorr=upar_puppi_plus_qt_JECCorr,
 			weight=weights,
 		)
 		out['histo12'].fill(
 			dataset=events.metadata["dataset"],
 			qt=boson_pt,
 			pv=pv.npvs,
-			uperp_pf_raw=uperp_pf_raw[:,0],
-			uperp_puppi_raw=uperp_puppi_raw[:,0],
+			#uperp_pf_raw=uperp_pf_raw[:,0],
+			#uperp_puppi_raw=uperp_puppi_raw[:,0],
+			uperp_pf_raw=uperp_pf_raw,
+			uperp_puppi_raw=uperp_puppi_raw,
 			weight=weights,
 		)
 		out['histo13'].fill(
 			dataset=events.metadata["dataset"],
 			qt=boson_pt,
 			pv=pv.npvs,
-			uperp_pf=uperp_pf[:,0],
-			uperp_pf_JECCorr=uperp_pf_JECCorr[:,0],
-			#uperp_pf=uperp_pf,
-			#uperp_pf_JECCorr=uperp_pf_JECCorr,
+			#uperp_pf=uperp_pf[:,0],
+			#uperp_pf_JECCorr=uperp_pf_JECCorr[:,0],
+			uperp_pf=uperp_pf,
+			uperp_pf_JECCorr=uperp_pf_JECCorr,
 			weight=weights,
 		)
 		out['histo14'].fill(
 			dataset=events.metadata["dataset"],
 			qt=boson_pt,
 			pv=pv.npvs,
-			uperp_puppi=uperp_puppi[:,0],
-			uperp_puppi_JECCorr=uperp_puppi_JECCorr[:,0],
-			#uperp_puppi=uperp_puppi,
-			#uperp_puppi_JECCorr=uperp_puppi_JECCorr,
+			#uperp_puppi=uperp_puppi[:,0],
+			#uperp_puppi_JECCorr=uperp_puppi_JECCorr[:,0],
+			uperp_puppi=uperp_puppi,
+			uperp_puppi_JECCorr=uperp_puppi_JECCorr,
 			weight=weights,
 		)
 		out['histo15'].fill(
@@ -573,22 +573,22 @@ class performanceProcessor(processor.ProcessorABC):
 			nEventsNPV=nEventsNPV
 		)
 		# For Dy
-		#out['histo20'].fill(
-		#	nEventsMuon=nEventsMuon
-		#)
-		# For Gamma
 		out['histo20'].fill(
-			nEventsPhoton=nEventsPhoton
+			nEventsMuon=nEventsMuon
 		)
-		out['histo21'].fill(
-			nEventsLepton=nEventsLepton
-		)
-		out['histo22'].fill(
-			nEventsJet=nEventsJet
-		)
-		out['histo23'].fill(
-			nEventsDeltaR=nEventsDeltaR
-		)
+		# For Gamma
+		#out['histo20'].fill(
+		#	nEventsPhoton=nEventsPhoton
+		#)
+		#out['histo21'].fill(
+		#	nEventsLepton=nEventsLepton
+		#)
+		#out['histo22'].fill(
+		#	nEventsJet=nEventsJet
+		#)
+		#out['histo23'].fill(
+		#	nEventsDeltaR=nEventsDeltaR
+		#)
 		
 		return out
 	

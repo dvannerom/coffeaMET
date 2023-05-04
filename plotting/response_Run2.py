@@ -39,30 +39,31 @@ if __name__ == '__main__':
 	inFile = ROOT.TFile.Open(inputFile,"READ")
 	
 	h_response_pf_raw = inFile.Get("response_pf_raw_vs_"+variable)
+	h_response_pf = inFile.Get("response_pf_JECCorr_vs_"+variable)
 	h_response_puppi_raw = inFile.Get("response_puppi_raw_vs_"+variable)
 	h_response_puppi = inFile.Get("response_puppi_JECCorr_vs_"+variable)
 	
 	response_pf_raw = response(h_response_pf_raw)
+	response_pf = response(h_response_pf)
 	response_puppi_raw = response(h_response_puppi_raw)
 	response_puppi = response(h_response_puppi)
 	
 	# Drawing
 	tdrstyle.setTDRStyle()
-
-	if isData:
-		if run == "2022C": CMS_lumi.lumi_13p6TeV = "4.9 fb^{-1}"
-		elif run == "2022D": CMS_lumi.lumi_13p6TeV = "2.9 fb^{-1}"
-		elif run == "2022E": CMS_lumi.lumi_13p6TeV = "5.7 fb^{-1}"
-		elif run == "2022F": CMS_lumi.lumi_13p6TeV = "17.6 fb^{-1}"
-		elif run == "2022G": CMS_lumi.lumi_13p6TeV = "3.1 fb^{-1}"
+	
+	#change the CMS_lumi variables (see CMS_lumi.py)
+	#if isData: CMS_lumi.lumi_13p6TeV = "2.94 fb^{-1}"
+	if isData: CMS_lumi.lumi_13TeV = "59.8 fb^{-1}"
 	CMS_lumi.writeExtraText = 1
 	if isData: CMS_lumi.extraText = "Preliminary"
 	else: CMS_lumi.extraText = "Simulation Preliminary"
+	#CMS_lumi.lumi_sqrtS = "13.6 TeV" # used with iPeriod = 0, e.g. for simulation-only plots (default is an empty string)
+	CMS_lumi.lumi_sqrtS = "13 TeV" # used with iPeriod = 0, e.g. for simulation-only plots (default is an empty string)
 	
 	iPos = 11
 	
 	iPeriod = 0
-	if isData: iPeriod = 5
+	if isData: iPeriod = 4
 	
 	H_ref = 700 
 	W_ref = 850 
@@ -108,6 +109,11 @@ if __name__ == '__main__':
 	response_pf_raw.GetXaxis().SetTitle("q_{T} (GeV)")
 	response_pf_raw.GetYaxis().SetTitle("-<u_{#parallel}/q_{T}>")
 	
+	response_pf.Draw("PZ")
+	response_pf.SetLineColor(ROOT.kBlue)
+	response_pf.SetMarkerColor(ROOT.kBlue)
+	response_pf.SetMarkerStyle(20)
+	
 	response_puppi_raw.Draw("PZ")
 	response_puppi_raw.SetLineColor(ROOT.kRed)
 	response_puppi_raw.SetMarkerColor(ROOT.kRed)
@@ -131,11 +137,9 @@ if __name__ == '__main__':
 	latex.SetTextFont(42)
 	latex.SetTextSize(0.04)
 	#latex.SetTextAlign(13);  //align at top
-	if isData:
-		latex.DrawLatexNDC(.3,.4,run+" data")
-		if dataset=="gamma": latex.DrawLatexNDC(.3,.35,"#bf{#gamma}+jets channel")
-		elif dataset=="dy": latex.DrawLatexNDC(.3,.35,"#bf{#mu#mu}+jets channel")
-	else: latex.DrawLatexNDC(.3,.4,"MC")
+	if isData: latex.DrawLatexNDC(.3,.4,"2018 data")
+	if dataset=="gamma": latex.DrawLatexNDC(.3,.35,"#bf{#gamma}+jets channel")
+	elif dataset=="dy": latex.DrawLatexNDC(.3,.35,"#bf{#mu#mu}+jets channel")
 	
 	leg = ROOT.TLegend(.58,.25,.83,.48)
 	leg.SetBorderSize(0)
@@ -145,6 +149,7 @@ if __name__ == '__main__':
 	leg.SetTextSize(0.04)
 	leg.AddEntry(response_puppi,"Type-I Puppi p_{T}^{miss}","lep")
 	leg.AddEntry(response_puppi_raw,"Raw Puppi p_{T}^{miss}","lep")
+	leg.AddEntry(response_pf,"Type-I PF p_{T}^{miss}","lep")
 	leg.AddEntry(response_pf_raw,"Raw PF p_{T}^{miss}","lep")
 	leg.Draw()
 	

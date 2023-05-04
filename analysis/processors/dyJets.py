@@ -36,10 +36,11 @@ def dyJetsSelection(events):
 	nEvents = len(events)
 
 	# Apply golden json
-	lumiMask = LumiMask("data/2022_golden.json")
-	#lumiMask = LumiMask("/eos/home-c/cmsdqm/www/CAF/certification/Collisions22/Cert_Collisions2022_eraE_359022_360331_Golden.json")
+	# Run-2
+	#lumiMask = LumiMask("/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions18/13TeV/Legacy_2018/Cert_314472-325175_13TeV_Legacy2018_Collisions18_JSON.txt")
+	# Run-3
+	lumiMask = LumiMask("/eos/home-c/cmsdqm/www/CAF/certification/Collisions22/Cert_Collisions2022_355100_362760_Golden.json")
 	events = events[lumiMask(events.run,events.luminosityBlock)]
-
 	nEvents_lumi = len(events)
 
 	# Apply trigger and MET filters
