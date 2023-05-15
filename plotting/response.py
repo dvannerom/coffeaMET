@@ -40,7 +40,7 @@ if __name__ == '__main__':
 	
 	h_response_pf_raw = inFile.Get("response_pf_raw_vs_"+variable)
 	h_response_puppi_raw = inFile.Get("response_puppi_raw_vs_"+variable)
-	h_response_puppi = inFile.Get("response_puppi_JECCorr_vs_"+variable)
+	h_response_puppi = inFile.Get("response_puppi_TypeI_JESUp_vs_"+variable)
 	
 	response_pf_raw = response(h_response_pf_raw)
 	response_puppi_raw = response(h_response_puppi_raw)
@@ -135,7 +135,8 @@ if __name__ == '__main__':
 		latex.DrawLatexNDC(.3,.4,run+" data")
 		if dataset=="gamma": latex.DrawLatexNDC(.3,.35,"#bf{#gamma}+jets channel")
 		elif dataset=="dy": latex.DrawLatexNDC(.3,.35,"#bf{#mu#mu}+jets channel")
-	else: latex.DrawLatexNDC(.3,.4,"MC")
+	else:
+		if dataset=="dy": latex.DrawLatexNDC(.3,.4,"DY(#mu#mu) MC")
 	
 	leg = ROOT.TLegend(.58,.25,.83,.48)
 	leg.SetBorderSize(0)

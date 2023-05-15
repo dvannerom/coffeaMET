@@ -64,14 +64,14 @@ inFile = ROOT.TFile.Open(inFileName,"READ")
 
 h_pf_raw = inFile.Get(component+"_pf_raw_vs_"+variable)
 h_puppi_raw = inFile.Get(component+"_puppi_raw_vs_"+variable)
-h_puppi = inFile.Get(component+"_puppi_vs_"+variable)
+h_puppi = inFile.Get(component+"_puppi_TypeI_vs_"+variable)
 
 # Get response to correct resolutions
 h_response_pf_raw = inFile.Get("response_pf_raw_vs_"+variable)
 response_pf_raw = response(h_response_pf_raw)
 h_response_puppi_raw = inFile.Get("response_puppi_raw_vs_"+variable)
 response_puppi_raw = response(h_response_puppi_raw)
-h_response_puppi = inFile.Get("response_puppi_JECCorr_vs_"+variable)
+h_response_puppi = inFile.Get("response_puppi_TypeI_vs_"+variable)
 response_puppi = response(h_response_puppi)
 
 resolutionUncorr_pf_raw = resolution(h_pf_raw)
@@ -96,6 +96,8 @@ tdrstyle.setTDRStyle()
 #change the CMS_lumi variables (see CMS_lumi.py)
 CMS_lumi.writeExtraText = 1
 CMS_lumi.extraText = "Preliminary"
+if isData: CMS_lumi.extraText = "Preliminary"
+else: CMS_lumi.extraText = "Simulation Preliminary"
 
 if isData:
 	if run == "2022C": CMS_lumi.lumi_13p6TeV = "4.9 fb^{-1}"
@@ -153,6 +155,7 @@ elif component == "uperp": resolution_pf_raw.GetYaxis().SetTitle("#sigma(u_{#per
 #resolution_pf_raw.SetMinimum(10)
 resolution_pf_raw.SetMinimum(0)
 resolution_pf_raw.SetMaximum(60)
+#resolution_pf_raw.GetXaxis().SetLimits(0,60)
 
 resolution_puppi_raw.Draw("PZ")
 resolution_puppi_raw.SetLineColor(ROOT.kRed)
@@ -176,12 +179,16 @@ frame.Draw()
 latex = ROOT.TLatex()
 latex.SetTextFont(42)
 latex.SetTextSize(0.04)
-if isData: latex.DrawLatexNDC(.3,.35,run+" data")
-if dataset=="gamma": latex.DrawLatexNDC(.3,.3,"#bf{#gamma}+jets channel")
-elif dataset=="dy": latex.DrawLatexNDC(.3,.3,"#bf{#mu#mu}+jets channel")
+if isData:
+	latex.DrawLatexNDC(.3,.4,run+" data")
+	if dataset=="gamma": latex.DrawLatexNDC(.3,.35,"#bf{#gamma}+jets channel")
+	elif dataset=="dy": latex.DrawLatexNDC(.3,.35,"#bf{#mu#mu}+jets channel")
+else:
+	if dataset=="dy": latex.DrawLatexNDC(.3,.25,"DY(#mu#mu) MC")
+
 latex.DrawLatexNDC(.3,.2,"Response corrected")
 
-leg = ROOT.TLegend(.35,.7,.55,.9)
+leg = ROOT.TLegend(.65,.7,.85,.9)
 leg.SetBorderSize(0)
 leg.SetFillColor(0)
 leg.SetFillStyle(0)

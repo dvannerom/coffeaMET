@@ -32,26 +32,31 @@ def prescale(events):
 	ps = np.ones(len(events.HLT.IsoMu24))
 	return ps
 
-def dyJetsSelection(events):
+def dyJetsSelection(events, isData):
 	nEvents = len(events)
 
-	# Apply golden json
-	# Run-2
-	#lumiMask = LumiMask("/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions18/13TeV/Legacy_2018/Cert_314472-325175_13TeV_Legacy2018_Collisions18_JSON.txt")
-	# Run-3
-	lumiMask = LumiMask("/eos/home-c/cmsdqm/www/CAF/certification/Collisions22/Cert_Collisions2022_355100_362760_Golden.json")
-	events = events[lumiMask(events.run,events.luminosityBlock)]
+	# Apply golden json to data
+	if isData:
+		lumiMask = LumiMask("/eos/home-c/cmsdqm/www/CAF/certification/Collisions22/Cert_Collisions2022_355100_362760_Golden.json")
+		events = events[lumiMask(events.run,events.luminosityBlock)]
 	nEvents_lumi = len(events)
 
-	# Apply trigger and MET filters
+	# Apply MET filters
 	events = events[METCleaning(events)]
 	nEvents_filters = len(events)
-	events = events[HLT_SingleMuon(events)]
+	# Apply trigger to data
+	if isData: events = events[HLT_SingleMuon(events)]
 	nEvents_trigger = len(events)
 
 	# Ignore events with npv == 0
 	events = events[(events.PV.npvs > 0)]
 	nEvents_npv = len(events)
+
+	# Define jet selection
+	goodJetCHS = events.JetCHS[(events.JetCHS.pt >= 15) & (np.abs(events.JetCHS.eta) <= 5.2)]
+	goodJet = events.Jet[(events.Jet.pt >= 15) & (np.abs(events.Jet.eta) <= 5.2)]
+	events = events[(ak.num(goodJetCHS) >= 1) & (ak.num(goodJet) >= 1)]
+	nEvents_jet = len(events)
 
 	# Define good muons
 	selectedMuons = events.Muon[(events.Muon.pt >= 10) & (np.abs(events.Muon.eta) < 2.4) & (np.abs(events.Muon.dxy) < 0.045) & (np.abs(events.Muon.dz) < 0.2) & events.Muon.mediumId & (events.Muon.isGlobal | events.Muon.isTracker) & (events.Muon.miniPFRelIso_all < 0.15)]
@@ -110,18 +115,14 @@ def dyJetsSelection(events):
 	)
 	Zboson = leadingMuon + subleadingMuon
 	pv = events.PV
-	met_pf_raw = events.RawMET
-	met_pf = events.MET
-	met_puppi_raw = events.RawPuppiMET
-	met_puppi = events.PuppiMET
 	
 	# Retrieve prescale
-	#weights = prescale(events)
-	weights = np.ones(len(events))
+	if isData: weights = prescale(events)
+	else: weights = np.ones(len(events))
 	
 	dyDict = {'events': events,
               'nEvents_tot': nEvents,
               'nEvents_lumi': nEvents_lumi, 'nEvents_filters': nEvents_filters, 'nEvents_trigger': nEvents_trigger, 'nEvents_npv': nEvents_npv, 'nEvents_muon': nEvents_muon,
-              'weights': weights, 'boson': Zboson, 'pv': pv, 'met_pf_raw': met_pf_raw, 'met_pf': met_pf, 'met_puppi_raw': met_puppi_raw, 'met_puppi': met_puppi}
+              'weights': weights, 'boson': Zboson, 'pv': pv}
 	
 	return dyDict
